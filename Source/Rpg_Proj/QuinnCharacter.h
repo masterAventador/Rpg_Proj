@@ -6,10 +6,34 @@
 #include "GameFramework/Character.h"
 #include "QuinnCharacter.generated.h"
 
+class UInputMappingContext;
+struct FInputActionValue;
+class UInputAction;
+class USpringArmComponent;
+class UCameraComponent;
+
 UCLASS()
 class RPG_PROJ_API AQuinnCharacter : public ACharacter
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Camera,meta=(AllowPrivateAccess= true))
+	USpringArmComponent* CameraBoom;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Camera,meta=(AllowPrivateAccess = true))
+	UCameraComponent* FollowCamera;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess = true))
+	UInputMappingContext* DefaultInputMappingContext;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess = true))
+	UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess = true))
+	UInputAction* LookAction;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess = true))
+	UInputAction* JumpAction;
 
 public:
 	AQuinnCharacter();
@@ -21,15 +45,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Camera,meta=(AllowPrivateAccess = true))
-	class USpringArmComponent* CameraBoom;
+	void Move(const FInputActionValue& Value);
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Camera,meta=(AllowPrivateAccess = true))
-	class UCameraComponent* FollowCamera;
-	
-
-public:	
-	
+	void Look(const FInputActionValue& Value);
 
 };
