@@ -3,29 +3,34 @@
 
 #include "QuinnCharacter.h"
 
-// Sets default values
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+
 AQuinnCharacter::AQuinnCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
+	CameraBoom->SetupAttachment(GetMesh());
+	CameraBoom->TargetArmLength = 500.f;
+
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
+	FollowCamera->SetupAttachment(CameraBoom,USpringArmComponent::SocketName);
 
 }
 
-// Called when the game starts or when spawned
 void AQuinnCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-// Called every frame
 void AQuinnCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-// Called to bind functionality to input
 void AQuinnCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
