@@ -16,7 +16,7 @@ ABaseCharacter::ABaseCharacter()
 	bUseControllerRotationYaw = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.f,1000.f,0.f);
+	GetCharacterMovement()->RotationRate = FRotator(0.f,500.f,0.f);
 	
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	CameraBoom->SetupAttachment(GetRootComponent());
