@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QuinnCharacter.h"
+#include "BaseCharacter.h"
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -9,7 +9,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-AQuinnCharacter::AQuinnCharacter()
+ABaseCharacter::ABaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -28,7 +28,7 @@ AQuinnCharacter::AQuinnCharacter()
 	
 }
 
-void AQuinnCharacter::BeginPlay()
+void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -48,13 +48,13 @@ void AQuinnCharacter::BeginPlay()
 
 
 
-void AQuinnCharacter::Tick(float DeltaTime)
+void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-void AQuinnCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
@@ -66,7 +66,7 @@ void AQuinnCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 }
 
-void AQuinnCharacter::Move(const FInputActionValue& Value)
+void ABaseCharacter::Move(const FInputActionValue& Value)
 {
 	
 	if (Controller)
@@ -81,7 +81,7 @@ void AQuinnCharacter::Move(const FInputActionValue& Value)
 	}
 } 
 
-void AQuinnCharacter::Look(const FInputActionValue& Value)
+void ABaseCharacter::Look(const FInputActionValue& Value)
 {
 	if (Controller)
 	{
