@@ -9,17 +9,17 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-ABaseCharacter::ABaseCharacter()
+ABaseCharacter::ABaseCharacter():
+bMoving(false),
+MaxRunSpeed(600.f),
+MaxCrouchSpeed(300.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
 	bUseControllerRotationYaw = false;
 
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.f,500.f,0.f);
-	
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
-	CameraBoom->SetupAttachment(GetRootComponent());
+	CameraBoom->SetupAttachment(GetMesh());
 	CameraBoom->TargetArmLength = 500.f;
 	CameraBoom->bUsePawnControlRotation = true;
 
@@ -31,6 +31,18 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	MovementComponent = GetCharacterMovement();
+
+	MovementComponent->NavAgentProps.bCanCrouch = true;
+	
+	MovementComponent->bOrientRotationToMovement = true;
+	MovementComponent->RotationRate = FRotator(0.f,500.f,0.f);
+	MovementComponent->MaxWalkSpeed = MaxRunSpeed;
+	MovementComponent->MaxWalkSpeedCrouched = MaxCrouchSpeed;
+	MovementComponent->SetCrouchedHalfHeight(60.f);
+
+	MovementComponent->NavAgentProps.bCanCrouch = true;
 
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
@@ -62,6 +74,7 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInputComponent->BindAction(CrouchAction,ETriggerEvent::Started,this,&ThisClass::CrouchButtonPressed);
 	}
 
 }
@@ -88,6 +101,17 @@ void ABaseCharacter::Look(const FInputActionValue& Value)
 		FVector2D LookVector = Value.Get<FVector2D>();
 		AddControllerYawInput(LookVector.X);
 		AddControllerPitchInput(LookVector.Y);
+	}
+}
+
+void ABaseCharacter::CrouchButtonPressed(const FInputActionValue& Value)
+{
+	if (bIsCrouched)
+	{
+		UnCrouch();
+	} else
+	{
+		Crouch();
 	}
 }
 

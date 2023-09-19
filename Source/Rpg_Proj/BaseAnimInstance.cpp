@@ -28,5 +28,12 @@ void UBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsMoving = GroundSpeed > 0;
 
 	bIsJumping = MovementComponent->IsFalling();
+
+	bIsCrouching = Character->bIsCrouched;
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,-1,FColor::Red,FString::Printf(TEXT("current speed:%f"),GroundSpeed));
+	}
 	
 }
