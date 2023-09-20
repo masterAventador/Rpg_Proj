@@ -17,47 +17,58 @@ class RPG_PROJ_API ABaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+	friend class UBaseAnimInstance;
+	
 	UPROPERTY()
 	UCharacterMovementComponent* MovementComponent;
 	
 	/*
 	 * Camera
 	 */
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Camera,meta=(AllowPrivateAccess= true))
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Camera,meta=(AllowPrivateAccess=true))
 	USpringArmComponent* CameraBoom;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Camera,meta=(AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Camera,meta=(AllowPrivateAccess=true))
 	UCameraComponent* FollowCamera;
 	
 	/*
 	 * Input Mapping
 	 */
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess=true))
 	UInputMappingContext* DefaultInputMappingContext;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess=true))
 	UInputAction* MoveAction;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess=true))
 	UInputAction* LookAction;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess=true))
 	UInputAction* JumpAction;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess=true))
 	UInputAction* CrouchAction;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Input,meta=(AllowPrivateAccess=true))
+	UInputAction* SprintAction;
 	
 	/*
 	 * Movement
 	 */
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Movement,meta=(AllowPrivateAccess = true))
-	bool bMoving;
-
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Movement,meta=(AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Movement,meta=(AllowPrivateAccess=true))
 	float MaxRunSpeed;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Movement,meta=(AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Movement,meta=(AllowPrivateAccess=true))
 	float MaxCrouchSpeed;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Movement,meta=(AllowPrivateAccess=true))
+	float MaxSprintSpeed;
+
+	/*
+	 * Character State
+	 */
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Movement,meta=(AllowPrivateAccess=true))
+	bool bIsSprinting;
 
 public:
 	ABaseCharacter();
@@ -69,10 +80,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void Move(const FInputActionValue& Value);
+	void MoveActionTriggered(const FInputActionValue& Value);
 
-	void Look(const FInputActionValue& Value);
+	void LookActionTriggered(const FInputActionValue& Value);
 
 	void CrouchButtonPressed(const FInputActionValue& Value);
+
+	void SprintButtonPressed(const FInputActionValue& Value);
 
 };

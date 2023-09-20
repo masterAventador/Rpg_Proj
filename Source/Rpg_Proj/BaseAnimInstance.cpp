@@ -31,6 +31,8 @@ void UBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	bIsCrouching = Character->bIsCrouched;
 
+	bIsSprinting = Character->bIsSprinting;
+
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1,-1,FColor::Red,FString::Printf(TEXT("current speed:%f"),GroundSpeed));

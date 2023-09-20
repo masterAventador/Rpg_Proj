@@ -10,9 +10,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 ABaseCharacter::ABaseCharacter():
-bMoving(false),
-MaxRunSpeed(600.f),
-MaxCrouchSpeed(300.f)
+MaxRunSpeed(500.f),
+MaxCrouchSpeed(350.f),
+MaxSprintSpeed(700.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -41,6 +41,7 @@ void ABaseCharacter::BeginPlay()
 	MovementComponent->MaxWalkSpeed = MaxRunSpeed;
 	MovementComponent->MaxWalkSpeedCrouched = MaxCrouchSpeed;
 	MovementComponent->SetCrouchedHalfHeight(60.f);
+	MovementComponent->MaxAcceleration = 1000.f;
 
 	MovementComponent->NavAgentProps.bCanCrouch = true;
 
@@ -70,16 +71,18 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::MoveActionTriggered);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::LookActionTriggered);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(CrouchAction,ETriggerEvent::Started,this,&ThisClass::CrouchButtonPressed);
+		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Started,this,&ThisClass::SprintButtonPressed);
+		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Completed,this,&ThisClass::SprintButtonPressed);
 	}
 
 }
 
-void ABaseCharacter::Move(const FInputActionValue& Value)
+void ABaseCharacter::MoveActionTriggered(const FInputActionValue& Value)
 {
 	
 	if (Controller)
@@ -94,7 +97,7 @@ void ABaseCharacter::Move(const FInputActionValue& Value)
 	}
 } 
 
-void ABaseCharacter::Look(const FInputActionValue& Value)
+void ABaseCharacter::LookActionTriggered(const FInputActionValue& Value)
 {
 	if (Controller)
 	{
@@ -113,6 +116,12 @@ void ABaseCharacter::CrouchButtonPressed(const FInputActionValue& Value)
 	{
 		Crouch();
 	}
+}
+
+void ABaseCharacter::SprintButtonPressed(const FInputActionValue& Value)
+{
+	MovementComponent->MaxWalkSpeed = bIsSprinting ? MaxRunSpeed : MaxSprintSpeed;
+	bIsSprinting = !bIsSprinting;
 }
 
 
