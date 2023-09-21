@@ -8,11 +8,14 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "MotionWarpingComponent.h"
 
 ABaseCharacter::ABaseCharacter():
 MaxRunSpeed(500.f),
 MaxCrouchSpeed(350.f),
-MaxSprintSpeed(700.f)
+MaxSprintSpeed(700.f),
+VaultOverCheckedDistance(100.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -25,6 +28,8 @@ MaxSprintSpeed(700.f)
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
 	FollowCamera->SetupAttachment(CameraBoom,USpringArmComponent::SocketName);
+
+	MotionWarpingComponent = CreateDefaultSubobject<UMotionWarpingComponent>("MotionWarping");
 	
 }
 
@@ -78,6 +83,7 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(CrouchAction,ETriggerEvent::Started,this,&ThisClass::CrouchButtonPressed);
 		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Started,this,&ThisClass::SprintButtonPressed);
 		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Completed,this,&ThisClass::SprintButtonPressed);
+		EnhancedInputComponent->BindAction(VaultAction,ETriggerEvent::Started,this,&ThisClass::VaultButtonPressed);
 	}
 
 }
@@ -124,7 +130,37 @@ void ABaseCharacter::SprintButtonPressed(const FInputActionValue& Value)
 	bIsSprinting = !bIsSprinting;
 }
 
+void ABaseCharacter::VaultButtonPressed(const FInputActionValue& Value)
+{
+	const TArray<AActor*> ActorToIngore;
+	FHitResult ForwardHitResult;
+	bool ForwardHit = false;
+	
+	for (int i = 0;i < 3;i++)
+	{
+		FVector ForwardStartLocation = GetActorLocation();
+		ForwardStartLocation.Z += i * 30.f;
+		FVector ForwardEndLocation = ForwardStartLocation + GetActorForwardVector() * VaultOverCheckedDistance;
+		ForwardHit = UKismetSystemLibrary::SphereTraceSingle(this,ForwardStartLocation,ForwardEndLocation,5.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::ForDuration,ForwardHitResult,true);
+		if (ForwardHit)
+		{
+			break;
+		}
+	}
 
+	if (!ForwardHit) return;
+	FHitResult DownwardHitResult;
+	bool DownwardHit = false;
+	for (int i = 0; i < 5;i++)
+	{
+		FVector DownwardStartLocation = ForwardHitResult.Location;
+		DownwardStartLocation.Z += 100.f;
+		DownwardStartLocation += GetActorForwardVector() * i * 50.f;
+		FVector DownwardEndLocation = DownwardStartLocation;
+		DownwardEndLocation.Z = ForwardHitResult.Location.Z;
+		DownwardHit = UKismetSystemLibrary::SphereTraceSingle(this,DownwardStartLocation,DownwardEndLocation,8.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::ForDuration,DownwardHitResult,true,FLinearColor::Blue,FLinearColor::Yellow);
+	}
+}
 
 
 
