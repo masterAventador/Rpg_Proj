@@ -6,6 +6,7 @@
 #include "BaseCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+
 void UBaseAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
@@ -37,5 +38,11 @@ void UBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		GEngine->AddOnScreenDebugMessage(-1,-1,FColor::Red,FString::Printf(TEXT("current speed:%f"),GroundSpeed));
 	}
-	
+
+}
+
+void UBaseAnimInstance::playAnimationMontage(UAnimMontage* Montage)
+{
+	if (!Montage) return;
+	Montage_Play(Montage);
 }

@@ -15,7 +15,7 @@ ABaseCharacter::ABaseCharacter():
 MaxRunSpeed(500.f),
 MaxCrouchSpeed(350.f),
 MaxSprintSpeed(700.f),
-VaultOverCheckedDistance(100.f)
+VaultOverCheckedDistance(500.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -40,17 +40,15 @@ void ABaseCharacter::BeginPlay()
 	MovementComponent = GetCharacterMovement();
 
 	MovementComponent->NavAgentProps.bCanCrouch = true;
-	
 	MovementComponent->bOrientRotationToMovement = true;
 	MovementComponent->RotationRate = FRotator(0.f,500.f,0.f);
 	MovementComponent->MaxWalkSpeed = MaxRunSpeed;
 	MovementComponent->MaxWalkSpeedCrouched = MaxCrouchSpeed;
 	MovementComponent->SetCrouchedHalfHeight(60.f);
 	MovementComponent->MaxAcceleration = 1000.f;
-
 	MovementComponent->NavAgentProps.bCanCrouch = true;
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller)) // bind input mapping
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
@@ -58,10 +56,11 @@ void ABaseCharacter::BeginPlay()
 		}
 	}
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller)) // rotate the camera's default angle
 	{
 		PlayerController->RotationInput -= FRotator(30.f, 0.f, 0.f);
 	}
+
 }
 
 
@@ -90,7 +89,6 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ABaseCharacter::MoveActionTriggered(const FInputActionValue& Value)
 {
-	
 	if (Controller)
 	{
 		FVector2D MovementVector = Value.Get<FVector2D>();
@@ -132,6 +130,20 @@ void ABaseCharacter::SprintButtonPressed(const FInputActionValue& Value)
 
 void ABaseCharacter::VaultButtonPressed(const FInputActionValue& Value)
 {
+	if (!VaultOverMontage) return;
+	FVector VaultStart,VaultMiddle,VaultEnd;
+	if (FindVaultTarget(VaultStart,VaultMiddle,VaultEnd))
+	{
+		MovementComponent->MovementMode = MOVE_Flying;
+		MotionWarpingComponent->AddOrUpdateWarpTargetFromLocation("VaultStart",VaultStart);
+		MotionWarpingComponent->AddOrUpdateWarpTargetFromLocation("VaultMiddle",VaultMiddle);
+		MotionWarpingComponent->AddOrUpdateWarpTargetFromLocation("VaultEnd",VaultEnd);
+		PlayAnimMontage(VaultOverMontage);
+	}
+}
+
+bool ABaseCharacter::FindVaultTarget(FVector& VaultStart, FVector& VaultMiddle, FVector& VaultEnd)
+{
 	const TArray<AActor*> ActorToIngore;
 	FHitResult ForwardHitResult;
 	bool ForwardHit = false;
@@ -148,9 +160,9 @@ void ABaseCharacter::VaultButtonPressed(const FInputActionValue& Value)
 		}
 	}
 
-	if (!ForwardHit) return;
-	FHitResult DownwardHitResult;
-	bool DownwardHit = false;
+	if (!ForwardHit) return false;
+	
+	bool SurfaceHit = false,LandHit = false;
 	for (int i = 0; i < 5;i++)
 	{
 		FVector DownwardStartLocation = ForwardHitResult.Location;
@@ -158,8 +170,31 @@ void ABaseCharacter::VaultButtonPressed(const FInputActionValue& Value)
 		DownwardStartLocation += GetActorForwardVector() * i * 50.f;
 		FVector DownwardEndLocation = DownwardStartLocation;
 		DownwardEndLocation.Z = ForwardHitResult.Location.Z;
-		DownwardHit = UKismetSystemLibrary::SphereTraceSingle(this,DownwardStartLocation,DownwardEndLocation,8.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::ForDuration,DownwardHitResult,true,FLinearColor::Blue,FLinearColor::Yellow);
+
+		bool Hit = false;
+		FHitResult HitResult;
+		Hit = UKismetSystemLibrary::SphereTraceSingle(this,DownwardStartLocation,DownwardEndLocation,8.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::ForDuration,HitResult,true,FLinearColor::Blue,FLinearColor::Yellow);
+
+		if (Hit)
+		{
+			if (!SurfaceHit) // set the first hit point to the start location
+			{
+				VaultStart = HitResult.Location;
+			} else // always set the last hit point to the middle location
+			{
+				VaultMiddle = HitResult.Location;
+			}
+			SurfaceHit = true;
+			
+		} else if  (SurfaceHit) // the point which is not hit the surface,make this point to the end location
+		{
+			DownwardEndLocation.Z -= 1000.f;
+			LandHit = UKismetSystemLibrary::SphereTraceSingle(this,DownwardStartLocation,DownwardEndLocation,8.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::ForDuration,HitResult,true,FLinearColor::Black,FLinearColor::White);
+			VaultEnd = HitResult.Location;
+			break;
+		}
 	}
+	return SurfaceHit && LandHit;
 }
 
 

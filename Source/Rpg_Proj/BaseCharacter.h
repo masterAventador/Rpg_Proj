@@ -83,6 +83,12 @@ class RPG_PROJ_API ABaseCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Interactive,meta=(AllowPrivateAccess=true))
 	float VaultOverCheckedDistance;
 
+	/*
+	 * Animation Montages
+	 */
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category=Montage,meta=(AllowPrivateAccess=true))
+	UAnimMontage* VaultOverMontage;
+	
 public:
 	ABaseCharacter();
 	
@@ -103,6 +109,7 @@ private:
 	void SprintButtonPressed(const FInputActionValue& Value);
 
 	void VaultButtonPressed(const FInputActionValue& Value);
-	void FindVaultTarget();
+	
+	bool FindVaultTarget(FVector& VaultStart,FVector& VaultMiddle,FVector& VaultEnd);
 
 };

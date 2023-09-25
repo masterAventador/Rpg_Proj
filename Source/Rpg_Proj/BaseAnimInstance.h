@@ -35,13 +35,18 @@ class RPG_PROJ_API UBaseAnimInstance : public UAnimInstance
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true))
 	float ZSpeed;
 
-	
-	
+
 protected:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
 	
+public:
+	void playAnimationMontage(UAnimMontage* Montage);
 	
+
+
+
 	
 	
 };
