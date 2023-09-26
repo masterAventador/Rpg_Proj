@@ -15,7 +15,7 @@ ABaseCharacter::ABaseCharacter():
 MaxRunSpeed(500.f),
 MaxCrouchSpeed(350.f),
 MaxSprintSpeed(700.f),
-VaultOverCheckedDistance(500.f)
+VaultOverCheckedDistance(200.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
