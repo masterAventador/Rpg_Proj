@@ -37,6 +37,8 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this,&ThisClass::OnMontageEndedHandle);
+
 	MovementComponent = GetCharacterMovement();
 
 	MovementComponent->NavAgentProps.bCanCrouch = true;
@@ -162,39 +164,61 @@ bool ABaseCharacter::FindVaultTarget(FVector& VaultStart, FVector& VaultMiddle, 
 
 	if (!ForwardHit) return false;
 	
-	bool SurfaceHit = false,LandHit = false;
+	bool StartHit = false, MiddleHit = false,LandHit = false;
 	for (int i = 0; i < 5;i++)
 	{
 		FVector DownwardStartLocation = ForwardHitResult.Location;
 		DownwardStartLocation.Z += 100.f;
-		DownwardStartLocation += GetActorForwardVector() * i * 50.f;
+		DownwardStartLocation += GetActorForwardVector() * i * 80.f;
 		FVector DownwardEndLocation = DownwardStartLocation;
 		DownwardEndLocation.Z = ForwardHitResult.Location.Z;
 
 		bool Hit = false;
 		FHitResult HitResult;
-		Hit = UKismetSystemLibrary::SphereTraceSingle(this,DownwardStartLocation,DownwardEndLocation,8.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::ForDuration,HitResult,true,FLinearColor::Blue,FLinearColor::Yellow);
+		Hit = UKismetSystemLibrary::SphereTraceSingle(this,DownwardStartLocation,DownwardEndLocation,20.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::ForDuration,HitResult,true,FLinearColor::Blue,FLinearColor::Yellow);
 
 		if (Hit)
 		{
-			if (!SurfaceHit) // set the first hit point to the start location
+			if (!StartHit)
 			{
-				VaultStart = HitResult.Location;
-			} else // always set the last hit point to the middle location
+				VaultStart = HitResult.ImpactPoint;
+				StartHit = true;
+			} else
 			{
-				VaultMiddle = HitResult.Location;
+				VaultMiddle = HitResult.ImpactPoint;
+				MiddleHit = true;
 			}
-			SurfaceHit = true;
-			
-		} else if  (SurfaceHit) // the point which is not hit the surface,make this point to the end location
+		} else
 		{
-			DownwardEndLocation.Z -= 1000.f;
-			LandHit = UKismetSystemLibrary::SphereTraceSingle(this,DownwardStartLocation,DownwardEndLocation,8.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::ForDuration,HitResult,true,FLinearColor::Black,FLinearColor::White);
-			VaultEnd = HitResult.Location;
 			break;
 		}
 	}
-	return SurfaceHit && LandHit;
+
+	if (!StartHit || !MiddleHit) return false;
+
+	FHitResult LandHitResult;
+	FVector LandStartLocation , LandEndLocation;
+	LandStartLocation = VaultMiddle;
+	LandStartLocation += GetActorForwardVector() * 230.f;
+
+	LandEndLocation = LandStartLocation;
+	LandEndLocation.Z -= 1000.f;
+	LandHit = UKismetSystemLibrary::LineTraceSingle(this,LandStartLocation,LandEndLocation,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::ForDuration,LandHitResult,true,FLinearColor::White,FLinearColor::Black);
+
+	if (LandHit)
+	{
+		VaultEnd = LandHitResult.Location;
+	}
+
+	return LandHit;
+}
+
+void ABaseCharacter::OnMontageEndedHandle(UAnimMontage* AnimMontage, bool bInterrupted)
+{
+	if (AnimMontage == VaultOverMontage)
+	{
+		MovementComponent->MovementMode = MOVE_Walking;
+	}	
 }
 
 

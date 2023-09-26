@@ -12,6 +12,7 @@ void UBaseAnimInstance::NativeBeginPlay()
 	Super::NativeBeginPlay();
 	
 	Character = Cast<ABaseCharacter>(TryGetPawnOwner());
+	
 }
 
 void UBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)

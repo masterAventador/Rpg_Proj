@@ -86,6 +86,7 @@ class RPG_PROJ_API ABaseCharacter : public ACharacter
 	/*
 	 * Animation Montages
 	 */
+	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category=Montage,meta=(AllowPrivateAccess=true))
 	UAnimMontage* VaultOverMontage;
 	
@@ -111,5 +112,8 @@ private:
 	void VaultButtonPressed(const FInputActionValue& Value);
 	
 	bool FindVaultTarget(FVector& VaultStart,FVector& VaultMiddle,FVector& VaultEnd);
+
+	UFUNCTION()
+	void OnMontageEndedHandle(UAnimMontage* AnimMontage, bool bInterrupted);
 
 };
