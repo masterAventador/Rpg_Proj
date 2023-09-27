@@ -155,7 +155,7 @@ bool ABaseCharacter::FindVaultTarget(FVector& VaultStart, FVector& VaultMiddle, 
 		FVector ForwardStartLocation = GetActorLocation();
 		ForwardStartLocation.Z += i * 30.f;
 		FVector ForwardEndLocation = ForwardStartLocation + GetActorForwardVector() * VaultOverCheckedDistance;
-		ForwardHit = UKismetSystemLibrary::SphereTraceSingle(this,ForwardStartLocation,ForwardEndLocation,5.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::ForDuration,ForwardHitResult,true);
+		ForwardHit = UKismetSystemLibrary::SphereTraceSingle(this,ForwardStartLocation,ForwardEndLocation,5.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::None,ForwardHitResult,true);
 		if (ForwardHit)
 		{
 			break;
@@ -175,7 +175,7 @@ bool ABaseCharacter::FindVaultTarget(FVector& VaultStart, FVector& VaultMiddle, 
 
 		bool Hit = false;
 		FHitResult HitResult;
-		Hit = UKismetSystemLibrary::SphereTraceSingle(this,DownwardStartLocation,DownwardEndLocation,20.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::ForDuration,HitResult,true,FLinearColor::Blue,FLinearColor::Yellow);
+		Hit = UKismetSystemLibrary::SphereTraceSingle(this,DownwardStartLocation,DownwardEndLocation,20.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::None,HitResult,true);
 
 		if (Hit)
 		{
@@ -203,7 +203,7 @@ bool ABaseCharacter::FindVaultTarget(FVector& VaultStart, FVector& VaultMiddle, 
 
 	LandEndLocation = LandStartLocation;
 	LandEndLocation.Z -= 1000.f;
-	LandHit = UKismetSystemLibrary::LineTraceSingle(this,LandStartLocation,LandEndLocation,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::ForDuration,LandHitResult,true,FLinearColor::White,FLinearColor::Black);
+	LandHit = UKismetSystemLibrary::LineTraceSingle(this,LandStartLocation,LandEndLocation,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::None,LandHitResult,true);
 
 	if (LandHit)
 	{
