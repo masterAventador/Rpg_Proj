@@ -65,6 +65,21 @@ void ABaseCharacter::BeginPlay()
 
 }
 
+void ABaseCharacter::DoAssassination(EAssassinationType AssassinationType)
+{
+	if (UAnimMontage* TargetMontage = DoAssassinationMontageMap.Find(AssassinationType))
+	{
+		PlayAnimMontage(TargetMontage);
+	}
+}
+
+void ABaseCharacter::GetAssassination(EAssassinationType AssassinationType)
+{
+	if (UAnimMontage* TargetMontage = GetAssassinationMontageMap.Find(AssassinationType))
+	{
+		PlayAnimMontage(TargetMontage);
+	}
+}
 
 
 void ABaseCharacter::Tick(float DeltaTime)
@@ -132,6 +147,8 @@ void ABaseCharacter::SprintButtonPressed(const FInputActionValue& Value)
 
 void ABaseCharacter::VaultButtonPressed(const FInputActionValue& Value)
 {
+	DoAssassination(EAssassinationType::KickBall);
+	return;
 	if (!VaultOverMontage) return;
 	FVector VaultStart,VaultMiddle,VaultEnd;
 	if (FindVaultTarget(VaultStart,VaultMiddle,VaultEnd))

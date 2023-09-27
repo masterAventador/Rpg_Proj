@@ -13,6 +13,15 @@ class USpringArmComponent;
 class UCameraComponent;
 class UMotionWarpingComponent;
 
+UENUM(Blueprintable)
+enum class EAssassinationType : uint8
+{
+	KickBall UMETA(DisplayName="KickBall"),
+	LockThroat UMETA(DisplayName="LockThroat"),
+
+	MAX UMETA(DisplayName="DefaultMax")
+};
+
 UCLASS()
 class RPG_PROJ_API ABaseCharacter : public ACharacter
 {
@@ -89,6 +98,14 @@ class RPG_PROJ_API ABaseCharacter : public ACharacter
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category=Montage,meta=(AllowPrivateAccess=true))
 	UAnimMontage* VaultOverMontage;
+
+protected:
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Montage|Assassination")
+	TMap<EAssassinationType,UAnimMontage> DoAssassinationMontageMap;
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Montage|Assassination")
+	TMap<EAssassinationType,UAnimMontage> GetAssassinationMontageMap;
+	
 	
 public:
 	ABaseCharacter();
@@ -99,6 +116,10 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void DoAssassination(EAssassinationType AssassinationType);
+
+	virtual void GetAssassination(EAssassinationType AssassinationType);
 
 private:
 	void MoveActionTriggered(const FInputActionValue& Value);
