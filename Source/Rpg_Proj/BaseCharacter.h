@@ -101,10 +101,10 @@ class RPG_PROJ_API ABaseCharacter : public ACharacter
 
 protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Montage|Assassination")
-	TMap<EAssassinationType,UAnimMontage> DoAssassinationMontageMap;
+	TMap<EAssassinationType,UAnimMontage*> DoAssassinationMontageMap;
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Montage|Assassination")
-	TMap<EAssassinationType,UAnimMontage> GetAssassinationMontageMap;
+	TMap<EAssassinationType,UAnimMontage*> GetAssassinationMontageMap;
 	
 	
 public:

@@ -67,17 +67,19 @@ void ABaseCharacter::BeginPlay()
 
 void ABaseCharacter::DoAssassination(EAssassinationType AssassinationType)
 {
-	if (UAnimMontage* TargetMontage = DoAssassinationMontageMap.Find(AssassinationType))
+	if (DoAssassinationMontageMap.Contains(AssassinationType))
 	{
-		PlayAnimMontage(TargetMontage);
+		UAnimMontage* AnimMontage = DoAssassinationMontageMap[AssassinationType];
+		PlayAnimMontage(AnimMontage);
 	}
 }
 
 void ABaseCharacter::GetAssassination(EAssassinationType AssassinationType)
 {
-	if (UAnimMontage* TargetMontage = GetAssassinationMontageMap.Find(AssassinationType))
+	if (GetAssassinationMontageMap.Contains(AssassinationType))
 	{
-		PlayAnimMontage(TargetMontage);
+		UAnimMontage* AnimMontage = GetAssassinationMontageMap[AssassinationType];
+		PlayAnimMontage(AnimMontage);
 	}
 }
 
