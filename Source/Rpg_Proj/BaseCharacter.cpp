@@ -15,7 +15,7 @@ ABaseCharacter::ABaseCharacter():
 MaxRunSpeed(500.f),
 MaxCrouchSpeed(350.f),
 MaxSprintSpeed(700.f),
-VaultOverCheckedDistance(200.f)
+VaultOverCheckedDistance(100.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -149,8 +149,8 @@ void ABaseCharacter::SprintButtonPressed(const FInputActionValue& Value)
 
 void ABaseCharacter::VaultButtonPressed(const FInputActionValue& Value)
 {
-	DoAssassination(EAssassinationType::KickBall);
-	return;
+	// DoAssassination(EAssassinationType::KickBall);
+	// return;
 	if (!VaultOverMontage) return;
 	FVector VaultStart,VaultMiddle,VaultEnd;
 	if (FindVaultTarget(VaultStart,VaultMiddle,VaultEnd))

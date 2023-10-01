@@ -13,5 +13,8 @@ UCLASS()
 class RPG_PROJ_API UInteractionUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+	UPROPERTY(meta=(BindWidget))
+	class UTextBlock* InteractionTextBlock;
 };
