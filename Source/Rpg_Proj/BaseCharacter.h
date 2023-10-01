@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
+class USphereComponent;
 class UInputMappingContext;
 struct FInputActionValue;
 class UInputAction;
@@ -35,6 +36,11 @@ class RPG_PROJ_API ABaseCharacter : public ACharacter
 	/*
 	 * Components
 	 */
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true))
+	USphereComponent* CollisionDetectComponent;
+
+	
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Camera,meta=(AllowPrivateAccess=true))
 	USpringArmComponent* CameraBoom;
 

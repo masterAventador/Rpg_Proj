@@ -10,16 +10,19 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "MotionWarpingComponent.h"
+#include "Components/SphereComponent.h"
 
 ABaseCharacter::ABaseCharacter():
 MaxRunSpeed(500.f),
 MaxCrouchSpeed(350.f),
-MaxSprintSpeed(700.f),
-VaultOverCheckedDistance(100.f)
+MaxSprintSpeed(700.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
 	bUseControllerRotationYaw = false;
+
+	CollisionDetectComponent = CreateDefaultSubobject<USphereComponent>("CollisionDetect");
+	CollisionDetectComponent->SetupAttachment(GetRootComponent());
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	CameraBoom->SetupAttachment(GetMesh());
@@ -37,7 +40,10 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/*Montage callback*/
 	GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this,&ThisClass::OnMontageEndedHandle);
+
+	VaultOverCheckedDistance = CollisionDetectComponent->GetScaledSphereRadius();
 
 	MovementComponent = GetCharacterMovement();
 
