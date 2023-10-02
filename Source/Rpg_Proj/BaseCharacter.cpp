@@ -3,10 +3,12 @@
 
 #include "BaseCharacter.h"
 
+#include "BaseItem.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "InteractionInterface.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "MotionWarpingComponent.h"
@@ -23,6 +25,8 @@ MaxSprintSpeed(700.f)
 
 	CollisionDetectComponent = CreateDefaultSubobject<USphereComponent>("CollisionDetect");
 	CollisionDetectComponent->SetupAttachment(GetRootComponent());
+	CollisionDetectComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CollisionDetectComponent->SetCollisionResponseToAllChannels(ECR_Overlap);
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	CameraBoom->SetupAttachment(GetMesh());
@@ -42,6 +46,9 @@ void ABaseCharacter::BeginPlay()
 
 	/*Montage callback*/
 	GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this,&ThisClass::OnMontageEndedHandle);
+
+	CollisionDetectComponent->OnComponentBeginOverlap.AddDynamic(this,&ThisClass::OnComponentBeginOverlap);
+	CollisionDetectComponent->OnComponentEndOverlap.AddDynamic(this,&ThisClass::OnComponentEndOverlap);
 
 	VaultOverCheckedDistance = CollisionDetectComponent->GetScaledSphereRadius();
 
@@ -180,7 +187,7 @@ bool ABaseCharacter::FindVaultTarget(FVector& VaultStart, FVector& VaultMiddle, 
 		FVector ForwardStartLocation = GetActorLocation();
 		ForwardStartLocation.Z += i * 30.f;
 		FVector ForwardEndLocation = ForwardStartLocation + GetActorForwardVector() * VaultOverCheckedDistance;
-		ForwardHit = UKismetSystemLibrary::SphereTraceSingle(this,ForwardStartLocation,ForwardEndLocation,5.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::None,ForwardHitResult,true);
+		ForwardHit = UKismetSystemLibrary::SphereTraceSingle(this,ForwardStartLocation,ForwardEndLocation,5.f,TraceTypeQuery1,false,ActorToIngore,EDrawDebugTrace::ForDuration,ForwardHitResult,true);
 		if (ForwardHit)
 		{
 			break;
@@ -244,6 +251,24 @@ void ABaseCharacter::OnMontageEndedHandle(UAnimMontage* AnimMontage, bool bInter
 	{
 		MovementComponent->MovementMode = MOVE_Walking;
 	}	
+}
+
+void ABaseCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (ABaseItem* item = Cast<ABaseItem>(OtherActor))
+	{
+		item->SetInteractionWidgetVisibility(true);
+	}
+}
+
+void ABaseCharacter::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (ABaseItem* item = Cast<ABaseItem>(OtherActor))
+	{
+		item->SetInteractionWidgetVisibility(false);
+	}
 }
 
 

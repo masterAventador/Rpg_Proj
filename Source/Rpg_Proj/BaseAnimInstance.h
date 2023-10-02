@@ -42,7 +42,6 @@ protected:
 
 	
 public:
-	void playAnimationMontage(UAnimMontage* Montage);
 	
 
 

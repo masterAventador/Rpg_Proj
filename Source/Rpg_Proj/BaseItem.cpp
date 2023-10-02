@@ -12,19 +12,24 @@ ABaseItem::ABaseItem()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	SphereComponent = CreateDefaultSubobject<USphereComponent>("Sphere");
-	SetRootComponent(SphereComponent);
-
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	MeshComponent->SetupAttachment(GetRootComponent());
 	
 	InteractionWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("Interaction");
 	InteractionWidgetComponent->SetupAttachment(GetRootComponent());
+	
+	InteractionWidgetComponent->SetVisibility(false);
+}
+
+void ABaseItem::SetInteractionWidgetVisibility(bool bVisibility)
+{
+	InteractionWidgetComponent->SetVisibility(bVisibility);
 }
 
 void ABaseItem::BeginPlay()
 {
 	Super::BeginPlay();
+	SetWidgetText("Press F to VaultOver");
 }
 
 void ABaseItem::SetWidgetText(FString&& textString)

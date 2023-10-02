@@ -35,15 +35,4 @@ void UBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	bIsSprinting = Character->bIsSprinting;
 
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1,-1,FColor::Red,FString::Printf(TEXT("current speed:%f"),GroundSpeed));
-	}
-
-}
-
-void UBaseAnimInstance::playAnimationMontage(UAnimMontage* Montage)
-{
-	if (!Montage) return;
-	Montage_Play(Montage);
 }
