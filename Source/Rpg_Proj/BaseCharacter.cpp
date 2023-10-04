@@ -87,15 +87,6 @@ void ABaseCharacter::DoAssassination(EAssassinationType AssassinationType)
 	}
 }
 
-void ABaseCharacter::GetAssassination(EAssassinationType AssassinationType)
-{
-	if (GetAssassinationMontageMap.Contains(AssassinationType))
-	{
-		UAnimMontage* AnimMontage = GetAssassinationMontageMap[AssassinationType];
-		PlayAnimMontage(AnimMontage);
-	}
-}
-
 
 void ABaseCharacter::Tick(float DeltaTime)
 {
@@ -162,8 +153,8 @@ void ABaseCharacter::SprintButtonPressed(const FInputActionValue& Value)
 
 void ABaseCharacter::VaultButtonPressed(const FInputActionValue& Value)
 {
-	// DoAssassination(EAssassinationType::KickBall);
-	// return;
+	DoAssassination(EAssassinationType::KickBall);
+	return;
 	if (!VaultOverMontage) return;
 	FVector VaultStart,VaultMiddle,VaultEnd;
 	if (FindVaultTarget(VaultStart,VaultMiddle,VaultEnd))
@@ -256,7 +247,7 @@ void ABaseCharacter::OnMontageEndedHandle(UAnimMontage* AnimMontage, bool bInter
 void ABaseCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (ABaseItem* item = Cast<ABaseItem>(OtherActor))
+	if (IInteractionInterface* item = Cast<IInteractionInterface>(OtherActor))
 	{
 		item->SetInteractionWidgetVisibility(true);
 	}
@@ -265,7 +256,7 @@ void ABaseCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp
 void ABaseCharacter::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (ABaseItem* item = Cast<ABaseItem>(OtherActor))
+	if (IInteractionInterface* item = Cast<IInteractionInterface>(OtherActor))
 	{
 		item->SetInteractionWidgetVisibility(false);
 	}

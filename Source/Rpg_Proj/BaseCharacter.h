@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Enums.h"
 #include "BaseCharacter.generated.h"
 
 class USphereComponent;
@@ -13,15 +14,6 @@ class UInputAction;
 class USpringArmComponent;
 class UCameraComponent;
 class UMotionWarpingComponent;
-
-UENUM(Blueprintable)
-enum class EAssassinationType : uint8
-{
-	KickBall UMETA(DisplayName="KickBall"),
-	LockThroat UMETA(DisplayName="LockThroat"),
-
-	MAX UMETA(DisplayName="DefaultMax")
-};
 
 UCLASS()
 class RPG_PROJ_API ABaseCharacter : public ACharacter
@@ -109,10 +101,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Montage|Assassination")
 	TMap<EAssassinationType,UAnimMontage*> DoAssassinationMontageMap;
 	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Montage|Assassination")
-	TMap<EAssassinationType,UAnimMontage*> GetAssassinationMontageMap;
-	
-	
 public:
 	ABaseCharacter();
 	
@@ -124,8 +112,6 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void DoAssassination(EAssassinationType AssassinationType);
-
-	virtual void GetAssassination(EAssassinationType AssassinationType);
 
 private:
 	void MoveActionTriggered(const FInputActionValue& Value);

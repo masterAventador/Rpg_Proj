@@ -3,3 +3,10 @@
 
 #include "InteractionInterface.h"
 
+void IInteractionInterface::SetInteractionWidgetVisibility(bool bVisibility)
+{
+}
+
+void IInteractionInterface::SetInteractionWidgetText(FString&& Text)
+{
+}

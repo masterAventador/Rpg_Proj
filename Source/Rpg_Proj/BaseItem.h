@@ -24,11 +24,13 @@ class RPG_PROJ_API ABaseItem : public AActor,public IInteractionInterface
 public:	
 	ABaseItem();
 
-	virtual void SetInteractionWidgetVisibility(bool bVisibility) override; 
+	virtual void SetInteractionWidgetVisibility(bool bVisibility) override;
+	
+	virtual void SetInteractionWidgetText(FString&& Text) override;
 	
 protected:
 	virtual void BeginPlay() override;
 	
-	void SetWidgetText(FString&& textString);
+	
 
 };

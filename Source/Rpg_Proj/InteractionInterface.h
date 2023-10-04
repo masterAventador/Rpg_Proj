@@ -21,5 +21,7 @@ class RPG_PROJ_API IInteractionInterface
 	GENERATED_BODY()
 
 public:
-	virtual void SetInteractionWidgetVisibility(bool bVisibility) = 0;
+	virtual void SetInteractionWidgetVisibility(bool bVisibility);
+
+	virtual void SetInteractionWidgetText(FString&& Text);
 };
