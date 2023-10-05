@@ -8,10 +8,11 @@
 #include "InteractionInterface.h"
 #include "BaseEnemy.generated.h"
 
+class UBoxComponent;
 class UWidgetComponent;
 
 UCLASS()
-class RPG_PROJ_API ABaseEnemy : public ACharacter,public IInteractionInterface
+class RPG_PROJ_API ABaseEnemy : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -21,18 +22,19 @@ class RPG_PROJ_API ABaseEnemy : public ACharacter,public IInteractionInterface
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,meta=(AllowPrivateAccess=true))
 	UWidgetComponent* InteractionWidgetComponent;
 
-
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true))
+	UBoxComponent* AssassinationDetectBox;
 
 public:
 	ABaseEnemy();
 	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetInteractionWidgetVisibility(bool bVisibility) override;
+	virtual void SetInteractionWidgetVisibility(bool bVisibility);
 
-	virtual void SetInteractionWidgetText(FString&& Text) override;
+	virtual void SetInteractionWidgetText(FString&& Text);
 
-	virtual void PlayGetAssassinationMontage(EAssassinationType AssassinationType);
+	virtual void GetAssassination(EAssassinationType AssassinationType);
 
 	UFUNCTION()
 	void OnMontageEndedHandle(UAnimMontage* Montage, bool bInterrupted);
@@ -42,4 +44,10 @@ protected:
 	virtual void BeginPlay() override;
 private:
 	void ChangCollisionEnabled(ECollisionEnabled::Type NewType);
+
+	UFUNCTION()
+	void AssassinationBoxOnBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+	void AssassinationBoxOnEndOverlaypped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };

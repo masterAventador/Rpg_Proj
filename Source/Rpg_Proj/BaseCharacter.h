@@ -22,17 +22,24 @@ class RPG_PROJ_API ABaseCharacter : public ACharacter
 	GENERATED_BODY()
 
 	friend class UBaseAnimInstance;
+
+public:
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,meta=(AllowPrivateAccess=true))
+	ABaseEnemy* AssassinationEnemy;
 	
-	UPROPERTY()
-	UCharacterMovementComponent* MovementComponent;
-	
+	FVector AssassinationLocation;
+
+protected:
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Montage|Assassination")
+	TMap<EAssassinationType,UAnimMontage*> DoAssassinationMontageMap;
+
+private:
 	/*
 	 * Components
 	 */
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true))
-	USphereComponent* CollisionDetectComponent;
-
+	UPROPERTY()
+	UCharacterMovementComponent* MovementComponent;
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=Camera,meta=(AllowPrivateAccess=true))
 	USpringArmComponent* CameraBoom;
@@ -98,12 +105,6 @@ class RPG_PROJ_API ABaseCharacter : public ACharacter
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category=Montage,meta=(AllowPrivateAccess=true))
 	UAnimMontage* VaultOverMontage;
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,meta=(AllowPrivateAccess=true))
-	ABaseEnemy* OverlappedEnemy;
-
-protected:
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Montage|Assassination")
-	TMap<EAssassinationType,UAnimMontage*> DoAssassinationMontageMap;
 	
 public:
 	ABaseCharacter();
@@ -115,7 +116,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void PlayAssassinationMontage(EAssassinationType AssassinationType);
+	bool DoAssassination(EAssassinationType AssassinationType);
 
 private:
 	void MoveActionTriggered(const FInputActionValue& Value);

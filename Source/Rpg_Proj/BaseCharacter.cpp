@@ -23,11 +23,6 @@ MaxSprintSpeed(700.f)
 	
 	bUseControllerRotationYaw = false;
 
-	CollisionDetectComponent = CreateDefaultSubobject<USphereComponent>("CollisionDetect");
-	CollisionDetectComponent->SetupAttachment(GetRootComponent());
-	CollisionDetectComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	CollisionDetectComponent->SetCollisionResponseToAllChannels(ECR_Overlap);
-
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	CameraBoom->SetupAttachment(GetMesh());
 	CameraBoom->TargetArmLength = 500.f;
@@ -47,10 +42,7 @@ void ABaseCharacter::BeginPlay()
 	/*Montage callback*/
 	GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this,&ThisClass::OnMontageEndedHandle);
 
-	CollisionDetectComponent->OnComponentBeginOverlap.AddDynamic(this,&ThisClass::OnComponentBeginOverlap);
-	CollisionDetectComponent->OnComponentEndOverlap.AddDynamic(this,&ThisClass::OnComponentEndOverlap);
-
-	VaultOverCheckedDistance = CollisionDetectComponent->GetScaledSphereRadius();
+	VaultOverCheckedDistance = 200.f;
 
 	MovementComponent = GetCharacterMovement();
 
@@ -77,17 +69,22 @@ void ABaseCharacter::BeginPlay()
 
 }
 
-void ABaseCharacter::PlayAssassinationMontage(EAssassinationType AssassinationType)
+bool ABaseCharacter::DoAssassination(EAssassinationType AssassinationType)
 {
-	if (!OverlappedEnemy) return;
+	if (!AssassinationEnemy) return false;
+
+	if (AssassinationLocation.Equals(FVector::Zero())) return false;
 	
-	if (!DoAssassinationMontageMap.Contains(AssassinationType)) return;
+	if (!DoAssassinationMontageMap.Contains(AssassinationType)) return false;
+
+	MotionWarpingComponent->AddOrUpdateWarpTargetFromLocation("Kickball",AssassinationLocation);
 
 	UAnimMontage* AnimMontage = DoAssassinationMontageMap[AssassinationType];
 	PlayAnimMontage(AnimMontage);
 
-	OverlappedEnemy->PlayGetAssassinationMontage(AssassinationType);
-	
+	AssassinationEnemy->GetAssassination(AssassinationType);
+
+	return true;
 }
 
 
@@ -156,8 +153,8 @@ void ABaseCharacter::SprintButtonPressed(const FInputActionValue& Value)
 
 void ABaseCharacter::VaultButtonPressed(const FInputActionValue& Value)
 {
-	PlayAssassinationMontage(EAssassinationType::KickBall);
-	return;
+	if (DoAssassination(EAssassinationType::KickBall)) return;
+	
 	if (!VaultOverMontage) return;
 	FVector VaultStart,VaultMiddle,VaultEnd;
 	if (FindVaultTarget(VaultStart,VaultMiddle,VaultEnd))
@@ -254,10 +251,6 @@ void ABaseCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp
 	{
 		item->SetInteractionWidgetVisibility(true);
 	}
-	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(OtherActor))
-	{
-		OverlappedEnemy = Enemy;
-	}
 }
 
 void ABaseCharacter::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -266,10 +259,6 @@ void ABaseCharacter::OnComponentEndOverlap(UPrimitiveComponent* OverlappedCompon
 	if (IInteractionInterface* item = Cast<IInteractionInterface>(OtherActor))
 	{
 		item->SetInteractionWidgetVisibility(false);
-	}
-	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(OtherActor))
-	{
-		OverlappedEnemy = nullptr;
 	}
 }
 
