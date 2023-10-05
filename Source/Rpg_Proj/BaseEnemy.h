@@ -21,19 +21,25 @@ class RPG_PROJ_API ABaseEnemy : public ACharacter,public IInteractionInterface
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,meta=(AllowPrivateAccess=true))
 	UWidgetComponent* InteractionWidgetComponent;
 
+
+
 public:
 	ABaseEnemy();
-
-protected:
-	virtual void BeginPlay() override;
-
-public:	
+	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetInteractionWidgetVisibility(bool bVisibility) override;
 
 	virtual void SetInteractionWidgetText(FString&& Text) override;
 
-	virtual void GetAssassination(EAssassinationType AssassinationType);
+	virtual void PlayGetAssassinationMontage(EAssassinationType AssassinationType);
 
+	UFUNCTION()
+	void OnMontageEndedHandle(UAnimMontage* Montage, bool bInterrupted);
+
+	
+protected:
+	virtual void BeginPlay() override;
+private:
+	void ChangCollisionEnabled(ECollisionEnabled::Type NewType);
 };

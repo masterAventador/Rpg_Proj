@@ -7,6 +7,7 @@
 #include "Enums.h"
 #include "BaseCharacter.generated.h"
 
+class ABaseEnemy;
 class USphereComponent;
 class UInputMappingContext;
 struct FInputActionValue;
@@ -97,6 +98,9 @@ class RPG_PROJ_API ABaseCharacter : public ACharacter
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category=Montage,meta=(AllowPrivateAccess=true))
 	UAnimMontage* VaultOverMontage;
 
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,meta=(AllowPrivateAccess=true))
+	ABaseEnemy* OverlappedEnemy;
+
 protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Montage|Assassination")
 	TMap<EAssassinationType,UAnimMontage*> DoAssassinationMontageMap;
@@ -111,7 +115,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void DoAssassination(EAssassinationType AssassinationType);
+	virtual void PlayAssassinationMontage(EAssassinationType AssassinationType);
 
 private:
 	void MoveActionTriggered(const FInputActionValue& Value);

@@ -3,7 +3,6 @@
 
 #include "BaseCharacter.h"
 
-#include "BaseItem.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
@@ -13,6 +12,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "MotionWarpingComponent.h"
 #include "Components/SphereComponent.h"
+#include "BaseEnemy.h"
 
 ABaseCharacter::ABaseCharacter():
 MaxRunSpeed(500.f),
@@ -61,7 +61,6 @@ void ABaseCharacter::BeginPlay()
 	MovementComponent->MaxWalkSpeedCrouched = MaxCrouchSpeed;
 	MovementComponent->SetCrouchedHalfHeight(60.f);
 	MovementComponent->MaxAcceleration = 1000.f;
-	MovementComponent->NavAgentProps.bCanCrouch = true;
 
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller)) // bind input mapping
 	{
@@ -78,13 +77,17 @@ void ABaseCharacter::BeginPlay()
 
 }
 
-void ABaseCharacter::DoAssassination(EAssassinationType AssassinationType)
+void ABaseCharacter::PlayAssassinationMontage(EAssassinationType AssassinationType)
 {
-	if (DoAssassinationMontageMap.Contains(AssassinationType))
-	{
-		UAnimMontage* AnimMontage = DoAssassinationMontageMap[AssassinationType];
-		PlayAnimMontage(AnimMontage);
-	}
+	if (!OverlappedEnemy) return;
+	
+	if (!DoAssassinationMontageMap.Contains(AssassinationType)) return;
+
+	UAnimMontage* AnimMontage = DoAssassinationMontageMap[AssassinationType];
+	PlayAnimMontage(AnimMontage);
+
+	OverlappedEnemy->PlayGetAssassinationMontage(AssassinationType);
+	
 }
 
 
@@ -153,7 +156,7 @@ void ABaseCharacter::SprintButtonPressed(const FInputActionValue& Value)
 
 void ABaseCharacter::VaultButtonPressed(const FInputActionValue& Value)
 {
-	DoAssassination(EAssassinationType::KickBall);
+	PlayAssassinationMontage(EAssassinationType::KickBall);
 	return;
 	if (!VaultOverMontage) return;
 	FVector VaultStart,VaultMiddle,VaultEnd;
@@ -251,6 +254,10 @@ void ABaseCharacter::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp
 	{
 		item->SetInteractionWidgetVisibility(true);
 	}
+	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(OtherActor))
+	{
+		OverlappedEnemy = Enemy;
+	}
 }
 
 void ABaseCharacter::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -259,6 +266,10 @@ void ABaseCharacter::OnComponentEndOverlap(UPrimitiveComponent* OverlappedCompon
 	if (IInteractionInterface* item = Cast<IInteractionInterface>(OtherActor))
 	{
 		item->SetInteractionWidgetVisibility(false);
+	}
+	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(OtherActor))
+	{
+		OverlappedEnemy = nullptr;
 	}
 }
 
